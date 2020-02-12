@@ -32,7 +32,7 @@ def get_lookup_indicies(inpt_states, order=3):
 
     '''
     kmers = product(inpt_states, repeat=order)
-    indicies_map = {''.join(kmer) for kmer in kmers}
+    indicies_map = {''.join(kmer): idx for idx, kmer in enumerate(kmers)}
     return indicies_map
 
 
@@ -106,6 +106,10 @@ def get_kmers(inpt_seq, k=3, looping=False):
     kmers: list of strings
         list of kmers as described above
     '''
+    # trivial cases
+    if k > len(inpt_seq):
+        return None
+
     if looping:
         inpt_length = len(inpt_seq)
         inpt = deque(inpt_seq)
@@ -114,7 +118,7 @@ def get_kmers(inpt_seq, k=3, looping=False):
 
         kmers = []
         for _ in range(inpt_length):
-            kmers.append(list(inpt)[k:])
+            kmers.append(list(inpt)[:k])
             inpt.rotate(-1)
 
     else:
@@ -126,7 +130,7 @@ def get_kmers(inpt_seq, k=3, looping=False):
 
 def process_inpt(inpt_seq,
                  rule_number,
-                 input_states='01',
+                 input_states,
                  order=3,
                  looping=True):
     '''
@@ -169,7 +173,7 @@ def process_inpt(inpt_seq,
                            looping=looping)
 
     # translate inpt_kmers into lookup_indicies
-    lookup_indices = get_lookup_indicies(input_states='01', order=order)
+    lookup_indices = get_lookup_indicies(inpt_states=input_states, order=order)
     output_indicies = [lookup_indices[kmer] for kmer in inpt_kmers]
     output_seq = ''.join([rule_seq[idx] for idx in output_indicies])
 
